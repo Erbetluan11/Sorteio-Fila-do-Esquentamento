@@ -262,7 +262,7 @@ function copiarLista() {
     return;
   }
   const f = formatarDataHora(dataSorteio);
-  let texto = `🍽️ SOBEF - SORTEIO DA FILA DA COMIDA 🍽️\n`;
+  let texto = `🍽️ SOBEF - SORTEIO DA FILA DO ESQUENTAMENTO 🍽️\n`;
   texto += `━━━━━━━━━━━━━━━━━━━━━━\n`;
   texto += `🏆 Ordem Sorteada da Fila 🏆\n\n`;
   listaSorteada.forEach(function(nome, indice) {
@@ -272,7 +272,6 @@ function copiarLista() {
   texto += `\n📅 Data: ${f.data}\n`;
   texto += `⏰ Horário: ${f.hora}\n`;
   texto += `━━━━━━━━━━━━━━━━━━━━━━\n`;
-  texto += `🎲 Sorteio realizado em ${f.data} às ${f.hora}. Bom apetite! 🍴`;
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(texto)
