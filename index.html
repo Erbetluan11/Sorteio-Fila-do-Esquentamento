@@ -57,12 +57,19 @@
   .buttons { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
   button { flex: 1; min-width: 120px; padding: 14px 16px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.25s; }
   button:disabled { opacity: 0.6; cursor: not-allowed; }
-  .btn-primary { background: linear-gradient(135deg, #e65100 0%, #ff9800 100%); color: white; }
-  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(230, 81, 0, 0.45); }
-  .btn-copy { background: #ef6c00; color: white; }
-  .btn-copy:hover:not(:disabled) { background: #e65100; }
+  /* Botão Gerar - verde azulado */
+  .btn-primary { background: linear-gradient(135deg, #00897b 0%, #26a69a 100%); color: white; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(0, 137, 123, 0.45); }
+  /* Botão Copiar - azul */
+  .btn-copy { background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); color: white; }
+  .btn-copy:hover:not(:disabled) { background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%); }
+  /* Botão Limpar - cinza/laranja suave */
   .btn-secondary { background: #ffe0b2; color: #e65100; }
   .btn-secondary:hover:not(:disabled) { background: #ffcc80; }
+  /* Botão Histórico */
+  .btn-history { background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%); color: white; }
+  .btn-history:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(94, 53, 177, 0.45); }
+
   .participants { background: #fff3e0; padding: 18px; border-radius: 10px; border: 1px solid #ffe0b2; }
   .participants-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
   .participants h3 { color: #e65100; font-size: 16px; }
@@ -76,6 +83,117 @@
   .participant input { accent-color: #e65100; width: 15px; height: 15px; cursor: pointer; }
   .notification { position: fixed; top: 20px; right: 20px; background: #e65100; color: white; padding: 14px 22px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.25); transform: translateX(420px); transition: transform 0.3s; z-index: 1000; font-weight: 600; }
   .notification.show { transform: translateX(0); }
+
+  /* Modal de histórico */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 2px solid #ff9800;
+    background: #fff3e0;
+    border-radius: 16px 16px 0 0;
+  }
+  .modal-header h2 {
+    font-size: 18px;
+    color: #e65100;
+    margin: 0;
+  }
+  .modal-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #e65100;
+    cursor: pointer;
+    padding: 0;
+    min-width: auto;
+    flex: none;
+  }
+  .modal-body {
+    padding: 16px 20px 20px;
+  }
+  .history-empty {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+  }
+  .history-item {
+    border: 1px solid #ffe0b2;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fffaf5;
+  }
+  .history-item:last-child { margin-bottom: 0; }
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .history-date {
+    font-weight: 700;
+    color: #e65100;
+    font-size: 14px;
+  }
+  .history-count {
+    font-size: 12px;
+    color: #999;
+  }
+  .history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .history-list li {
+    font-size: 13px;
+    padding: 4px 0;
+    color: #333;
+  }
+  .history-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .history-actions button {
+    flex: none;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    min-width: auto;
+  }
+  .btn-view {
+    background: #ffcc80;
+    color: #e65100;
+  }
+  .btn-delete {
+    background: #ef5350;
+    color: #fff;
+  }
+
   @media (max-width: 520px) {
     .container { padding: 18px; }
     .logo-text { font-size: 36px; letter-spacing: 4px; }
@@ -102,6 +220,7 @@
     <button class="btn-primary" id="btnGerar" onclick="gerarLista()">🎲 Gerar Lista</button>
     <button class="btn-copy" id="btnCopiar" onclick="copiarLista()">📋 Copiar Lista</button>
     <button class="btn-secondary" id="btnLimpar" onclick="limpar()">🗑️ Limpar</button>
+    <button class="btn-history" id="btnHistorico" onclick="abrirHistorico()">🕒 Histórico</button>
   </div>
 
   <div class="participants">
@@ -118,12 +237,36 @@
 
 <div class="notification" id="notification">Lista copiada com sucesso!</div>
 
+<!-- Modal de histórico -->
+<div class="modal-overlay" id="modalHistorico">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>🕒 Histórico de Sorteios</h2>
+      <button class="modal-close" onclick="fecharHistorico()">×</button>
+    </div>
+    <div class="modal-body" id="historicoBody">
+      <div class="history-empty">Nenhum sorteio realizado ainda.</div>
+    </div>
+  </div>
+</div>
+
 <script>
 const participantesOriginais = ["DARILO", "FABRICIO", "GLEUCIANE", "NILDETE", "JHON", "LUAN", "ALEANDRA", "DANIEL", "ROGERIO", "JOAO PEDRO", "PAULO", "CARLA", "NAZARENO"];
 let selecionados = new Set(participantesOriginais);
 let listaSorteada = null;
 let dataSorteio = null;
 let sorteando = false;
+
+// Histórico de sorteios (carrega do localStorage)
+let historicoSorteios = [];
+try {
+  const salvo = localStorage.getItem('historicoSorteiosSobef');
+  if (salvo) {
+    historicoSorteios = JSON.parse(salvo);
+  }
+} catch (e) {
+  historicoSorteios = [];
+}
 
 const EMOJIS_POSICAO = ["🥇", "🥈", "🥉"];
 
@@ -174,6 +317,7 @@ function setBotoesDesabilitados(estado) {
   document.getElementById('btnGerar').disabled = estado;
   document.getElementById('btnCopiar').disabled = estado;
   document.getElementById('btnLimpar').disabled = estado;
+  document.getElementById('btnHistorico').disabled = estado;
 }
 
 function gerarLista() {
@@ -211,6 +355,19 @@ function gerarLista() {
 function finalizarSorteio(participantesAtivos) {
   listaSorteada = embaralhar(participantesAtivos);
   dataSorteio = new Date();
+
+  // Salvar no histórico
+  const registro = {
+    data: dataSorteio.toISOString(),
+    lista: listaSorteada.slice(),
+    selecionadosNaEpoca: Array.from(selecionados)
+  };
+  historicoSorteios.unshift(registro); // mais recente primeiro
+  try {
+    localStorage.setItem('historicoSorteiosSobef', JSON.stringify(historicoSorteios));
+  } catch (e) {
+    // ignora erro de storage
+  }
 
   let html = `<div class="result-header">🏆 Ordem Sorteada da Fila 🏆</div>`;
   html += `<div class="result-subheader">✨ Que comece o rango! Confira abaixo quem esquenta primeiro 👇</div>`;
@@ -313,6 +470,85 @@ function mostrarNotificacao(mensagem, tipo) {
   else { n.style.background = '#e65100'; n.style.color = '#fff'; }
   n.classList.add('show');
   setTimeout(function() { n.classList.remove('show'); }, 3000);
+}
+
+// Funções do histórico
+function abrirHistorico() {
+  const modal = document.getElementById('modalHistorico');
+  const body = document.getElementById('historicoBody');
+  modal.classList.add('open');
+
+  if (historicoSorteios.length === 0) {
+    body.innerHTML = `<div class="history-empty">Nenhum sorteio realizado ainda.</div>`;
+    return;
+  }
+
+  let html = '';
+  historicoSorteios.forEach(function(reg, idx) {
+    const dataObj = new Date(reg.data);
+    const f = formatarDataHora(dataObj);
+    html += `<div class="history-item">`;
+    html += `<div class="history-header">`;
+    html += `<div class="history-date">📅 ${f.data} às ${f.hora}</div>`;
+    html += `<div class="history-count">${reg.lista.length} participante(s)</div>`;
+    html += `</div>`;
+    html += `<ol class="history-list">`;
+    reg.lista.forEach(function(nome, i) {
+      const emoji = EMOJIS_POSICAO[i] || '🍽️';
+      html += `<li>${emoji} ${i + 1}º - ${nome}</li>`;
+    });
+    html += `</ol>`;
+    html += `<div class="history-actions">`;
+    html += `<button class="btn-view" onclick="visualizarSorteio(${idx})">👁️ Visualizar</button>`;
+    html += `<button class="btn-delete" onclick="deletarSorteio(${idx})">🗑️ Excluir</button>`;
+    html += `</div>`;
+    html += `</div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function fecharHistorico() {
+  document.getElementById('modalHistorico').classList.remove('open');
+}
+
+function visualizarSorteio(indice) {
+  const reg = historicoSorteios[indice];
+  if (!reg) return;
+
+  // Carregar esse sorteio como atual
+  listaSorteada = reg.lista.slice();
+  dataSorteio = new Date(reg.data);
+
+  // Atualizar UI como se fosse o resultado atual
+  let html = `<div class="result-header">🏆 Ordem Sorteada da Fila 🏆</div>`;
+  html += `<div class="result-subheader">✨ Sorteio realizado em ${dataSorteio.toLocaleString('pt-BR')}</div>`;
+  html += `<ol class="queue-list">`;
+  listaSorteada.forEach(function(nome, indice) {
+    const posicao = indice + 1;
+    const classe = posicao === 1 ? 'first' : '';
+    const delay = (indice * 0.08).toFixed(2);
+    const emoji = EMOJIS_POSICAO[indice] || '🍽️';
+    const rotulo = posicao === 1 ? `${emoji} 1º` : `${emoji} ${posicao}º`;
+    html += `<li class="queue-item ${classe}" style="animation-delay:${delay}s">
+      <div class="queue-position">${rotulo}</div>
+      <div class="queue-name">${nome}</div>
+    </li>`;
+  });
+  html += `</ol>`;
+
+  document.getElementById('resultBox').innerHTML = html;
+  fecharHistorico();
+  mostrarNotificacao('👀 Sorteio antigo carregado!', 'success');
+}
+
+function deletarSorteio(indice) {
+  if (!confirm('Tem certeza que deseja excluir este sorteio do histórico?')) return;
+  historicoSorteios.splice(indice, 1);
+  try {
+    localStorage.setItem('historicoSorteiosSobef', JSON.stringify(historicoSorteios));
+  } catch (e) {}
+  abrirHistorico(); // re-renderiza
 }
 
 atualizarDataHora();
