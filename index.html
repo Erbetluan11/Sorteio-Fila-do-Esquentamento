@@ -6,7 +6,9 @@
 <title>Sorteio da Fila da Comida - SOBEF</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
-.participant button { flex: 0 0 24px; min-width: 24px; max-width: 24px; width: 24px; height: 24px; padding: 0; margin-left: auto !important; display: inline-flex; align-items: center; justify-content: center; }
+.participant button { flex: 0 0 28px; min-width: 28px; max-width: 28px; width: 28px !important; height: 28px !important; padding: 0; margin-left: auto !important; display: inline-flex; align-items: center; justify-content: center; background: transparent !important; color: #757575 !important; border: 0; border-radius: 50% !important; font-size: 14px !important; font-weight: 400; box-shadow: none; transition: background .15s, color .15s; }
+.participant button:hover { background: #ffebee !important; color: #b71c1c !important; }
+.participant button:focus-visible { outline: 2px solid #e65100; outline-offset: 2px; }
 .participant { min-width: 0; }
 .participant > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .participant input { flex-shrink: 0; }
@@ -15,63 +17,34 @@
 </head>
 <body>
 <div class="container">
-  <div class="logo-area"><div class="logo-text">SOBEF</div></div>
-  <h1>🍽️ Sorteio da Fila da Comida</h1>
-  <p class="subtitle">Lista completa de quem esquenta a comida</p>
-
-  <div class="timestamp">
-    <strong>📅 Data/Horário:</strong> <span id="currentDateTime"></span>
-  </div>
-
-  <div class="result-box" id="resultBox">
-    <div class="empty-state">🍲 Selecione os participantes e clique em "Gerar Lista" para sortear a ordem da fila</div>
-  </div>
-
-  <div class="buttons">
-    <button class="btn-primary" id="btnGerar" onclick="gerarLista()">🎲 Gerar Lista</button>
-    <button class="btn-copy" id="btnCopiar" onclick="copiarLista()">📋 Copiar Lista</button>
-    <button class="btn-secondary" id="btnLimpar" onclick="limpar()">🗑️ Limpar</button>
-    <button class="btn-history" id="btnHistorico" onclick="abrirHistorico()">🕒 Histórico</button>
-  </div>
-
-  <div class="participants">
-    <div class="participants-header">
-      <h3>👥 Participantes (<span id="totalPart">0</span>/<span id="totalGeral">0</span> selecionados)</h3>
-      <div class="select-actions">
-        <button onclick="selecionarTodos()">✅ Marcar todos</button>
-        <button onclick="selecionarNenhum()">❌ Desmarcar todos</button>
-      </div>
-    </div>
-
-    <div class="add-participant" style="display:flex;gap:8px;margin-bottom:12px;">
-      <input type="text" id="novoNome" placeholder="Nome do estagiário temporário" autocomplete="off"
-             style="flex:1;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:15px;"
-             onkeydown="if(event.key==='Enter')adicionarParticipante()">
-      <button onclick="adicionarParticipante()"
-              style="padding:10px 16px;border:none;border-radius:8px;background:#e65100;color:#fff;font-weight:600;cursor:pointer;">
-        ➕ Adicionar
-      </button>
-    </div>
-
-    <div class="participants-list" id="participantsList"></div>
-  </div>
+<div class="logo-area"><div class="logo-text">SOBEF</div></div>
+<h1>🍽️ Sorteio da Fila da Comida</h1>
+<p class="subtitle">Lista completa de quem esquenta a comida</p>
+<div class="timestamp"><strong>📅 Data/Horário:</strong> <span id="currentDateTime"></span></div>
+<div class="result-box" id="resultBox"><div class="empty-state">🍲 Selecione os participantes e clique em "Gerar Lista" para sortear a ordem da fila</div></div>
+<div class="buttons">
+<button class="btn-primary" id="btnGerar" onclick="gerarLista()">🎲 Gerar Lista</button>
+<button class="btn-copy" id="btnCopiar" onclick="copiarLista()">📋 Copiar Lista</button>
+<button class="btn-secondary" id="btnLimpar" onclick="limpar()">🗑️ Limpar</button>
+<button class="btn-history" id="btnHistorico" onclick="abrirHistorico()">🕒 Histórico</button>
 </div>
-
+<div class="participants">
+<div class="participants-header">
+<h3>👥 Participantes (<span id="totalPart">0</span>/<span id="totalGeral">0</span> selecionados)</h3>
+<div class="select-actions"><button onclick="selecionarTodos()">✅ Marcar todos</button><button onclick="selecionarNenhum()">❌ Desmarcar todos</button></div>
+</div>
+<div class="add-participant" style="display:flex;gap:8px;margin-bottom:12px;">
+<input type="text" id="novoNome" placeholder="Nome do estagiário temporário" autocomplete="off" style="flex:1;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:15px;" onkeydown="if(event.key==='Enter')adicionarParticipante()">
+<button onclick="adicionarParticipante()" style="padding:10px 16px;border:none;border-radius:8px;background:#e65100;color:#fff;font-weight:600;cursor:pointer;">➕ Adicionar</button>
+</div>
+<div class="participants-list" id="participantsList"></div>
+</div>
+</div>
 <div class="notification" id="notification">Lista copiada com sucesso!</div>
-
-<!-- Modal de histórico -->
-<div class="modal-overlay" id="modalHistorico">
-  <div class="modal">
-    <div class="modal-header">
-      <h2>🕒 Histórico de Sorteios</h2>
-      <button class="modal-close" onclick="fecharHistorico()" aria-label="Fechar modal">×</button>
-    </div>
-    <div class="modal-body" id="historicoBody">
-      <div class="history-empty">Nenhum sorteio realizado ainda.</div>
-    </div>
-  </div>
-</div>
-
+<div class="modal-overlay" id="modalHistorico"><div class="modal">
+<div class="modal-header"><h2>🕒 Histórico de Sorteios</h2><button class="modal-close" onclick="fecharHistorico()" aria-label="Fechar modal">×</button></div>
+<div class="modal-body" id="historicoBody"><div class="history-empty">Nenhum sorteio realizado ainda.</div></div>
+</div></div>
 <script src="js/app.js" defer></script>
 </body>
 </html>
