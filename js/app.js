@@ -1,4 +1,5 @@
 const participantesOriginais = ["DARILO", "FABRICIO", "GLEUCIANE", "NILDETE", "JHON", "LUAN", "ALEANDRA", "DANIEL", "ROGERIO", "JOAO PEDRO", "PAULO", "CARLA", "NAZARENO"];
+let participantesTemporarios = [];
 let selecionados = new Set(participantesOriginais);
 let listaSorteada = null;
 let dataSorteio = null;
@@ -15,7 +16,64 @@ try {
   historicoSorteios = [];
 }
 
+// Participantes temporários (estagiários, etc.)
+try {
+  const temporariosSalvos = localStorage.getItem('participantesTemporariosSobef');
+  if (temporariosSalvos) {
+    participantesTemporarios = JSON.parse(temporariosSalvos);
+    participantesTemporarios.forEach(function(nome) {
+      selecionados.add(nome);
+    });
+  }
+} catch (e) {
+  participantesTemporarios = [];
+}
+
 const EMOJIS_POSICAO = ["🥇", "🥈", "🥉"];
+
+function getParticipantes() {
+  return participantesOriginais.concat(participantesTemporarios);
+}
+
+function salvarTemporarios() {
+  try {
+    localStorage.setItem('participantesTemporariosSobef', JSON.stringify(participantesTemporarios));
+  } catch (e) {}
+}
+
+function adicionarParticipante() {
+  const input = document.getElementById('novoNome');
+  const nome = input.value.trim().toUpperCase();
+
+  if (!nome) {
+    mostrarNotificacao('⚠️ Digite o nome do participante!', 'warning');
+    return;
+  }
+
+  if (getParticipantes().includes(nome)) {
+    mostrarNotificacao('⚠️ Este nome já está na lista!', 'warning');
+    return;
+  }
+
+  participantesTemporarios.push(nome);
+  selecionados.add(nome);
+  salvarTemporarios();
+
+  input.value = '';
+  input.focus();
+  mostrarParticipantes();
+  mostrarNotificacao('✅ ' + nome + ' adicionado à fila!', 'success');
+}
+
+function removerParticipanteTemporario(nome) {
+  participantesTemporarios = participantesTemporarios.filter(function(n) {
+    return n !== nome;
+  });
+  selecionados.delete(nome);
+  salvarTemporarios();
+  mostrarParticipantes();
+  mostrarNotificacao('🗑️ ' + nome + ' removido da lista.', 'warning');
+}
 
 function atualizarDataHora() {
   const agora = new Date();
@@ -26,13 +84,24 @@ function atualizarDataHora() {
 
 function mostrarParticipantes() {
   const lista = document.getElementById('participantsList');
-  document.getElementById('totalGeral').textContent = participantesOriginais.length;
+  const participantes = getParticipantes();
+
+  document.getElementById('totalGeral').textContent = participantes.length;
   atualizarContador();
-  lista.innerHTML = participantesOriginais.map(function(nome) {
+
+  lista.innerHTML = participantes.map(function(nome) {
     const marcado = selecionados.has(nome);
+    const temporario = participantesTemporarios.includes(nome);
+    const botaoRemover = temporario
+      ? `<button type="button" onclick="removerParticipanteTemporario('${nome.replace(/'/g, "\\'")}')"
+           style="margin-left:8px;border:none;background:#c62828;color:#fff;border-radius:6px;
+           width:24px;height:24px;cursor:pointer;font-size:13px;line-height:1;">✕</button>`
+      : '';
+
     return `<label class="participant${marcado ? '' : ' disabled'}" data-nome="${nome}">
-      <input type="checkbox" ${marcado ? 'checked' : ''} onchange="toggleParticipante('${nome.replace(/'/g, "\'")}')">
-      <span>${nome}</span>
+      <input type="checkbox" ${marcado ? 'checked' : ''} onchange="toggleParticipante('${nome.replace(/'/g, "\\'")}')">
+      <span>${nome}${temporario ? ' <small style="opacity:.65;">(temporário)</small>' : ''}</span>
+      ${botaoRemover}
     </label>`;
   }).join('');
 }
@@ -48,7 +117,7 @@ function toggleParticipante(nome) {
   if (el) el.classList.toggle('disabled', !selecionados.has(nome));
 }
 
-function selecionarTodos() { selecionados = new Set(participantesOriginais); mostrarParticipantes(); }
+function selecionarTodos() { selecionados = new Set(getParticipantes()); mostrarParticipantes(); }
 function selecionarNenhum() { selecionados = new Set(); mostrarParticipantes(); }
 
 function embaralhar(array) {
@@ -69,7 +138,7 @@ function setBotoesDesabilitados(estado) {
 
 function gerarLista() {
   if (sorteando) return;
-  const participantesAtivos = participantesOriginais.filter(function(n) { return selecionados.has(n); });
+  const participantesAtivos = getParticipantes().filter(function(n) { return selecionados.has(n); });
   if (participantesAtivos.length === 0) {
     mostrarNotificacao('⚠️ Selecione ao menos 1 participante!', 'warning');
     return;
@@ -103,18 +172,15 @@ function finalizarSorteio(participantesAtivos) {
   listaSorteada = embaralhar(participantesAtivos);
   dataSorteio = new Date();
 
-  // Salvar no histórico
   const registro = {
     data: dataSorteio.toISOString(),
     lista: listaSorteada.slice(),
     selecionadosNaEpoca: Array.from(selecionados)
   };
-  historicoSorteios.unshift(registro); // mais recente primeiro
+  historicoSorteios.unshift(registro);
   try {
     localStorage.setItem('historicoSorteiosSobef', JSON.stringify(historicoSorteios));
-  } catch (e) {
-    // ignora erro de storage
-  }
+  } catch (e) {}
 
   let html = `<div class="result-header">🏆 Ordem Sorteada da Fila 🏆</div>`;
   html += `<div class="result-subheader">✨ Que comece o rango! Confira abaixo quem esquenta primeiro 👇</div>`;
@@ -219,7 +285,6 @@ function mostrarNotificacao(mensagem, tipo) {
   setTimeout(function() { n.classList.remove('show'); }, 3000);
 }
 
-// Funções do histórico
 function abrirHistorico() {
   const modal = document.getElementById('modalHistorico');
   const body = document.getElementById('historicoBody');
@@ -263,11 +328,9 @@ function visualizarSorteio(indice) {
   const reg = historicoSorteios[indice];
   if (!reg) return;
 
-  // Carregar esse sorteio como atual
   listaSorteada = reg.lista.slice();
   dataSorteio = new Date(reg.data);
 
-  // Atualizar UI como se fosse o resultado atual
   let html = `<div class="result-header">🏆 Ordem Sorteada da Fila 🏆</div>`;
   html += `<div class="result-subheader">✨ Sorteio realizado em ${dataSorteio.toLocaleString('pt-BR')}</div>`;
   html += `<ol class="queue-list">`;
@@ -295,7 +358,7 @@ function deletarSorteio(indice) {
   try {
     localStorage.setItem('historicoSorteiosSobef', JSON.stringify(historicoSorteios));
   } catch (e) {}
-  abrirHistorico(); // re-renderiza
+  abrirHistorico();
 }
 
 atualizarDataHora();

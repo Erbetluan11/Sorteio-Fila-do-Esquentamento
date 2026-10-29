@@ -35,6 +35,17 @@
         <button onclick="selecionarNenhum()">❌ Desmarcar todos</button>
       </div>
     </div>
+
+    <div class="add-participant" style="display:flex;gap:8px;margin-bottom:12px;">
+      <input type="text" id="novoNome" placeholder="Nome do estagiário temporário" autocomplete="off"
+             style="flex:1;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:15px;"
+             onkeydown="if(event.key==='Enter')adicionarParticipante()">
+      <button onclick="adicionarParticipante()"
+              style="padding:10px 16px;border:none;border-radius:8px;background:#e65100;color:#fff;font-weight:600;cursor:pointer;">
+        ➕ Adicionar
+      </button>
+    </div>
+
     <div class="participants-list" id="participantsList"></div>
   </div>
 </div>
