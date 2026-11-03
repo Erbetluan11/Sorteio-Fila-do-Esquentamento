@@ -2,10 +2,6 @@
 
 Sistema de sorteio da ordem para esquentar a comida.
 
-## 🚀 Demo
-
-[Link para o GitHub Pages]
-
 ## 🛠️ Tecnologias
 
 - HTML5
